@@ -18,6 +18,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+import site.metacoding.blogv4junit.domain.book.Book;
+import site.metacoding.blogv4junit.domain.book.BookRepository;
 import site.metacoding.blogv4junit.web.dto.BookSaveReqDto;
 
 /**
@@ -45,8 +47,11 @@ public class BookApiControllerTest {
     @Autowired
     private TestRestTemplate rt; // 테스트 전용 RestTemplate
 
+    @Autowired
+    private BookRepository bookRepository;
+
     @Test
-    public void save_테스트() throws JsonProcessingException {
+    public void bookSave_테스트() throws JsonProcessingException {
 
         BookSaveReqDto reqDto = new BookSaveReqDto();
         reqDto.setTitle("제목1");
@@ -73,14 +78,10 @@ public class BookApiControllerTest {
     }
 
     @Test
-    public void findOne_테스트() throws JsonProcessingException {
-
-        BookSaveReqDto reqDto = new BookSaveReqDto();
-        reqDto.setTitle("제목1");
-        reqDto.setAuthor("메타코딩");
+    public void bookFindOne_테스트() throws JsonProcessingException {
 
         // given (JSON 데이터)
-        String body = new ObjectMapper().writeValueAsString(reqDto);
+        bookRepository.save(new Book(1L, "제목1", "메타코딩"));
 
         Long id = 1L;
 
@@ -88,13 +89,12 @@ public class BookApiControllerTest {
         // json 응답받으니까 String으로 받음
         ResponseEntity<String> response = rt.exchange("/api/book/" + id, HttpMethod.GET, null, String.class);
 
-        System.out.println(response.getBody());
         // then
         // DocumentContext는 json 분석 도구 (jayway 써드 파티 라이브러리)
-        // DocumentContext dc = JsonPath.parse(response.getBody());
-        // String author = dc.read("$.author");
-        // assertEquals(201, response.getStatusCodeValue());
-        // assertEquals("메타코딩", author);
+        DocumentContext dc = JsonPath.parse(response.getBody());
+        String author = dc.read("$.author");
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("메타코딩", author);
     }
 
 }

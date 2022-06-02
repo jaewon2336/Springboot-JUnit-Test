@@ -8,9 +8,11 @@ import javax.persistence.Id;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode // 주소비교 안함, 값만 비교함
 @Getter
+@NoArgsConstructor
 @Entity
 public class Book {
 
